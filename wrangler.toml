@@ -10,7 +10,7 @@ vars = { ENVIRONMENT = "development" }
 [[d1_databases]]
 binding = "DB"
 database_name = "baengo-db"
-database_id = "TODO_ADD_DATABASE_ID_FROM_CLOUDFLARE"
+database_id = "d4a9eca3-6117-4b3f-820e-77b7a3c23ff0"
 
 # Secrets: set via 'wrangler secret put JWT_SECRET'
 # Do NOT store secret values in wrangler.toml
