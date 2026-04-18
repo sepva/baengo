@@ -3,13 +3,15 @@ import { cors } from 'hono/cors'
 import authRoutes from './routes/auth'
 import gridRoutes from './routes/grid'
 import leaderboardRoutes from './routes/leaderboard'
+import { AuthPayload } from './middleware/auth'
 
 export interface Env {
   DB: D1Database
   ENVIRONMENT: string
+  JWT_SECRET: string
 }
 
-const app = new Hono<{ Bindings: Env }>()
+const app = new Hono<{ Bindings: Env; Variables: { user: AuthPayload } }>()
 
 // CORS middleware
 app.use('*', cors({

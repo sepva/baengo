@@ -7,16 +7,13 @@ import Leaderboard from '../components/Leaderboard'
 export default function DashboardPage() {
   const username = localStorage.getItem('username') || 'Player'
   const userId = parseInt(localStorage.getItem('userId') || '0')
-  const [pointsUpdated, setPointsUpdated] = useState(0)
   const [leaderboardRefresh, setLeaderboardRefresh] = useState(0)
 
-  const handleBaengo = (points: number) => {
-    setPointsUpdated(prev => prev + 1)
+  const handleBaengo = () => {
     setLeaderboardRefresh(prev => prev + 1)
   }
 
-  const handlePointsAdded = (points: number) => {
-    setPointsUpdated(prev => prev + 1)
+  const handlePointsAdded = () => {
     setLeaderboardRefresh(prev => prev + 1)
   }
 

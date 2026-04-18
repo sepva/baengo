@@ -6,9 +6,16 @@ export interface AuthPayload {
   username: string
 }
 
-const JWT_SECRET = 'your-secret-key-change-in-production' // Should come from env
+type AuthContext = {
+  Bindings: {
+    JWT_SECRET: string
+  }
+  Variables: {
+    user: AuthPayload
+  }
+}
 
-export async function verifyAuth(c: Context, next: Next) {
+export async function verifyAuth(c: Context<AuthContext>, next: Next) {
   const authHeader = c.req.header('Authorization')
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -18,7 +25,7 @@ export async function verifyAuth(c: Context, next: Next) {
   const token = authHeader.slice(7)
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as AuthPayload
+    const decoded = jwt.verify(token, c.env.JWT_SECRET) as AuthPayload
     c.set('user', decoded)
     await next()
   } catch (err) {
@@ -26,6 +33,6 @@ export async function verifyAuth(c: Context, next: Next) {
   }
 }
 
-export function generateToken(userId: number, username: string): string {
-  return jwt.sign({ userId, username }, JWT_SECRET, { expiresIn: '30d' })
+export function generateToken(userId: number, username: string, jwtSecret: string): string {
+  return jwt.sign({ userId, username }, jwtSecret, { expiresIn: '30d' })
 }

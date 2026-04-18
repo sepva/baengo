@@ -4,6 +4,7 @@ import { generateToken } from '../middleware/auth'
 
 interface Env {
   DB: D1Database
+  JWT_SECRET: string
 }
 
 const auth = new Hono<{ Bindings: Env }>()
@@ -39,7 +40,7 @@ auth.post('/register', async (c) => {
       .run()
 
     const userId = result.meta.last_row_id as number
-    const token = generateToken(userId, username)
+    const token = generateToken(userId, username, c.env.JWT_SECRET)
 
     // Initialize user scores
     await db
@@ -86,7 +87,7 @@ auth.post('/login', async (c) => {
       return c.json({ error: 'Unauthorized', message: 'Invalid credentials' }, 401)
     }
 
-    const token = generateToken(user.id, user.username)
+    const token = generateToken(user.id, user.username, c.env.JWT_SECRET)
 
     return c.json({
       message: 'Login successful',

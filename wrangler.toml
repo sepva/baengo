@@ -15,6 +15,9 @@ binding = "DB"
 database_name = "baengo-db"
 database_id = "TODO_ADD_DATABASE_ID_FROM_CLOUDFLARE"
 
+# Secrets: set via 'wrangler secret put JWT_SECRET'
+# Do NOT store secret values in wrangler.toml
+
 # Environment configurations
 [env.production]
 vars = { ENVIRONMENT = "production" }

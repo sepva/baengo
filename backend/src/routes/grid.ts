@@ -11,7 +11,7 @@ interface BingoItem {
   marked: boolean
 }
 
-const grid = new Hono<{ Bindings: Env }>()
+const grid = new Hono<{ Bindings: Env; Variables: { user: AuthPayload } }>()
 
 // Helper function to get today's date in Brussels timezone
 function getTodayBrussels(): string {
