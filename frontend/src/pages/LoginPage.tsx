@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { authApi } from '../api/client'
 
 interface LoginPageProps {
   onLoginSuccess: () => void
@@ -19,27 +20,14 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
     setLoading(true)
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      })
-
-      if (!response.ok) {
-        const data = await response.json()
-        throw new Error(data.message || 'Authentication failed')
-      }
-
-      const data = await response.json()
-      localStorage.setItem('authToken', data.token)
-      localStorage.setItem('username', data.username)
-      localStorage.setItem('userId', data.userId.toString())
+      const endpoint = isLogin ? authApi.login : authApi.register
+      await endpoint(username, password)
       
       onLoginSuccess()
       navigate('/')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      const message = (err as any)?.response?.data?.message || (err instanceof Error ? err.message : 'An error occurred')
+      setError(message)
     } finally {
       setLoading(false)
     }

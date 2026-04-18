@@ -10,8 +10,10 @@ export default function Header({ username }: HeaderProps) {
   const [showMenu, setShowMenu] = useState(false)
 
   const handleLogout = () => {
-    localStorage.removeItem('authToken')
+    localStorage.removeItem('accessToken')
+    localStorage.removeItem('refreshToken')
     localStorage.removeItem('username')
+    localStorage.removeItem('userId')
     navigate('/login')
   }
 
