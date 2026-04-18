@@ -23,5 +23,15 @@ routes = [
   { pattern = "baengo.melios.be", zone_name = "melios.be" }
 ]
 
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "baengo-db"
+database_id = "d4a9eca3-6117-4b3f-820e-77b7a3c23ff0"
+
 [env.development]
 vars = { ENVIRONMENT = "development" }
+
+[[env.development.d1_databases]]
+binding = "DB"
+database_name = "baengo-db"
+database_id = "d4a9eca3-6117-4b3f-820e-77b7a3c23ff0"
