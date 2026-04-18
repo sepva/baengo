@@ -3,6 +3,9 @@ main = "backend/src/index.ts"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
+[observability]
+enabled = true
+
 # Default variables (for all environments)
 vars = { ENVIRONMENT = "development" }
 

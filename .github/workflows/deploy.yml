@@ -46,11 +46,10 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          environment: production
           secrets: |
-            DATABASE_ID
             JWT_SECRET
         env:
-          DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           WRANGLER_TOML_PATH: ./wrangler.toml
 
