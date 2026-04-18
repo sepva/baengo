@@ -5,11 +5,11 @@ A fun, interactive office bingo game built with Cloudflare Workers, React, and T
 ## 🎯 Features
 
 - **Daily Random Grids**: Each player gets a unique 4x4 bingo card every day
-- **Safe Authentication**: Username/password auth with bcrypt hashing
+- **Secure Authentication**: Username/password auth with bcrypt hashing, short-lived JWTs, and rotating refresh tokens
 - **Real-time Scoring**:
   - 10 points per completed row or column
   - 100 points + "Baengo!" celebration for full card
-- **Leaderboards**: 
+- **Leaderboards**:
   - Lifetime points ranking
   - Bingo count ranking
 - **Persistent Data**: All scores tracked indefinitely
@@ -20,7 +20,7 @@ A fun, interactive office bingo game built with Cloudflare Workers, React, and T
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 20+ and npm
 - Cloudflare account with Workers and D1 access
 - Git
 
@@ -37,58 +37,60 @@ A fun, interactive office bingo game built with Cloudflare Workers, React, and T
    npm install
    ```
 
-3. **Set up environment variables**
-   ```bash
-   cp frontend/.env.example frontend/.env.local
-   ```
-
 ### Local Development
 
-1. **Configure Cloudflare D1 Database** (for local testing)
-   - Create a D1 database in your Cloudflare account
+1. **Configure Cloudflare D1 Database**
+   - Create a D1 database in your Cloudflare account: `npx wrangler d1 create baengo-db`
    - Update `wrangler.toml` with your database ID
-   - Run migrations: `wrangler d1 migrations apply baengo-db --local`
+   - Run migrations: `npx wrangler d1 migrations apply baengo-db --local`
 
-2. **Seed initial bingo items**
+2. **Set the JWT secret**
+   ```bash
+   npx wrangler secret put JWT_SECRET
+   ```
+
+3. **Seed initial bingo items**
    ```bash
    npm run seed-db
    ```
 
-3. **Start development servers**
+4. **Start development servers**
    ```bash
    npm run dev
    ```
 
-   This will start:
+   This starts:
    - Backend (Wrangler): http://localhost:8787
    - Frontend (Vite): http://localhost:5173
 
-4. **Open in browser**
+5. **Open in browser**
    Navigate to http://localhost:5173
 
 ### Project Structure
 
 ```
 baengo/
-├── backend/                 # Cloudflare Workers backend
+├── backend/                 # Cloudflare Workers backend (Hono)
 │   ├── src/
-│   │   ├── index.ts        # Main Hono app
-│   │   ├── middleware/     # Auth middleware
-│   │   └── routes/         # API routes (auth, grid, leaderboard)
+│   │   ├── index.ts        # Main Hono app entry point
+│   │   ├── middleware/     # Auth, rate limiting, security headers
+│   │   ├── routes/         # API routes (auth, grid, leaderboard)
+│   │   ├── schemas/        # Zod validation schemas
+│   │   └── utils/          # Error mappers and helpers
 │   ├── package.json
 │   └── tsconfig.json
-├── frontend/               # React frontend
+├── frontend/               # React 18 frontend (Vite + Tailwind)
 │   ├── src/
-│   │   ├── pages/         # Page components
-│   │   ├── components/    # Reusable components
-│   │   ├── api/           # API client
+│   │   ├── pages/         # LoginPage, DashboardPage
+│   │   ├── components/    # BingoGrid, Header, Leaderboard, ScoreBoard
+│   │   ├── api/           # Axios API client
 │   │   ├── App.tsx
 │   │   └── main.tsx
 │   ├── vite.config.ts
 │   └── tailwind.config.js
 ├── config/                # Configuration files
 │   └── bingo_items.yaml   # Bingo card content
-├── migrations/            # D1 database migrations
+├── migrations/            # D1 database migrations (4 migrations)
 ├── scripts/               # Utility scripts
 │   └── seed-db.js        # Database seeding script
 └── wrangler.toml         # Cloudflare Workers config
@@ -128,21 +130,22 @@ npm run seed-db
 
 ### Prerequisites
 
-- Cloudflare account
+- Cloudflare account with Workers and Pages enabled
 - GitHub account
-- Domain configured on Cloudflare
+- Domain configured on Cloudflare (production route: `baengo.melios.be/api/*`)
 
 ### Deploy to Production
 
 1. **Set up Cloudflare**
-   - Create D1 database: `baengo-db`
-   - Configure DNS for `baengo.melios.be`
-   - Generate API token for CI/CD
+   - Create D1 database: `npx wrangler d1 create baengo-db`
+   - Run migrations against production: `npx wrangler d1 migrations apply baengo-db --remote`
+   - Create a Cloudflare Pages project named `baengo`
 
 2. **Add GitHub Secrets**
    - `CLOUDFLARE_API_TOKEN`
    - `CLOUDFLARE_ACCOUNT_ID`
    - `CLOUDFLARE_D1_DATABASE_ID`
+   - `JWT_SECRET`
 
 3. **Push to main branch**
    ```bash
@@ -150,9 +153,10 @@ npm run seed-db
    ```
 
    GitHub Actions will automatically:
-   - Run tests
-   - Build the frontend
-   - Deploy to Cloudflare Workers & Pages
+   - Type-check backend and frontend
+   - Build frontend (Vite) and backend (Wrangler)
+   - Deploy the Worker to Cloudflare Workers
+   - Deploy the frontend to Cloudflare Pages
 
 4. **Verify deployment**
    Visit https://baengo.melios.be
@@ -160,9 +164,10 @@ npm run seed-db
 ## 📊 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Create account
-- `POST /api/auth/login` - Login
-- `POST /api/auth/logout` - Logout
+- `POST /api/auth/register` - Create account (rate limited: 5 req/10 min)
+- `POST /api/auth/login` - Login (rate limited: 10 req/15 min)
+- `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/logout` - Logout and invalidate refresh token
 
 ### Grid
 - `GET /api/grid/today` - Get today's grid
@@ -175,14 +180,15 @@ npm run seed-db
 
 ## 🔒 Security
 
-- Passwords are hashed with bcrypt
-- JWT tokens expire after 30 days
-- CORS enabled for safe cross-origin requests
-- All API routes except auth require valid token
+- Passwords hashed with bcrypt (cost factor 10)
+- JWT access tokens expire after **15 minutes**; refresh tokens expire after **7 days**
+- Rate limiting on auth endpoints (in-memory, per-IP)
+- Account lockout after repeated failed login attempts
+- Security headers on all responses (HSTS, CSP, X-Frame-Options, etc.)
+- All API routes except auth require a valid Bearer token
 
 ## 🎨 Design
 
-The UI follows AE internal application design patterns:
 - Clean, minimal aesthetic
 - Gradient headers (purple/blue)
 - Rounded buttons and cards
