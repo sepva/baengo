@@ -19,6 +19,9 @@ wrangler.toml.local
 .env.local
 .env.*.local
 .env.production.local
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
 
 # IDE
 .vscode/

@@ -1,25 +1,30 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import LoginPage from './pages/LoginPage'
-import DashboardPage from './pages/DashboardPage'
-import { useState, useEffect } from 'react'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import DashboardPage from "./pages/DashboardPage";
+import { useState, useEffect } from "react";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is authenticated from localStorage
-    const token = localStorage.getItem('accessToken')
-    setIsAuthenticated(!!token)
-    setLoading(false)
-  }, [])
+    const token = localStorage.getItem("accessToken");
+    setIsAuthenticated(!!token);
+    setLoading(false);
+  }, []);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="text-lg text-gray-600">Loading Baengo...</div>
       </div>
-    )
+    );
   }
 
   return (
@@ -28,7 +33,11 @@ function App() {
         <Route
           path="/login"
           element={
-            isAuthenticated ? <Navigate to="/" /> : <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />
+            isAuthenticated ? (
+              <Navigate to="/" />
+            ) : (
+              <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />
+            )
           }
         />
         <Route
@@ -39,7 +48,7 @@ function App() {
         />
       </Routes>
     </Router>
-  )
+  );
 }
 
-export default App
+export default App;

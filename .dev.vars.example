@@ -1,0 +1,4 @@
+# Local Cloudflare Worker variables for development only
+# Copy to .dev.vars and set your own values
+JWT_SECRET=replace-with-a-random-secret-at-least-32-characters-long
+ENVIRONMENT=development

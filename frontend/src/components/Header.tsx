@@ -1,21 +1,21 @@
-import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 interface HeaderProps {
-  username?: string
+  username?: string;
 }
 
 export default function Header({ username }: HeaderProps) {
-  const navigate = useNavigate()
-  const [showMenu, setShowMenu] = useState(false)
+  const navigate = useNavigate();
+  const [showMenu, setShowMenu] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken')
-    localStorage.removeItem('refreshToken')
-    localStorage.removeItem('username')
-    localStorage.removeItem('userId')
-    navigate('/login')
-  }
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("username");
+    localStorage.removeItem("userId");
+    navigate("/login");
+  };
 
   return (
     <header className="bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg">
@@ -49,5 +49,5 @@ export default function Header({ username }: HeaderProps) {
         )}
       </div>
     </header>
-  )
+  );
 }
