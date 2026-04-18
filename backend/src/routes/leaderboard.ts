@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { ValidationError } from '../utils/error-mapper'
 
 interface Env {
   DB: D1Database
@@ -14,11 +15,33 @@ interface LeaderboardEntry {
 
 const leaderboard = new Hono<{ Bindings: Env }>()
 
+/**
+ * Validate and parse limit query parameter
+ * Must be integer between 1 and 100
+ */
+function validateLimit(limitParam: string | undefined): number {
+  const DEFAULT_LIMIT = 50
+  const MAX_LIMIT = 100
+  const MIN_LIMIT = 1
+
+  if (!limitParam) return DEFAULT_LIMIT
+
+  const limit = parseInt(limitParam, 10)
+  if (isNaN(limit)) {
+    throw new ValidationError(`Limit must be a valid integer`)
+  }
+  if (limit < MIN_LIMIT || limit > MAX_LIMIT) {
+    throw new ValidationError(`Limit must be between ${MIN_LIMIT} and ${MAX_LIMIT}`)
+  }
+
+  return limit
+}
+
 // Get lifetime leaderboard (by points)
 leaderboard.get('/lifetime', async (c) => {
   try {
     const db = c.env.DB
-    const limit = c.req.query('limit') ? parseInt(c.req.query('limit')!) : 50
+    const limit = validateLimit(c.req.query('limit'))
 
     const result = await db
       .prepare(`
@@ -58,7 +81,7 @@ leaderboard.get('/lifetime', async (c) => {
 leaderboard.get('/bingos', async (c) => {
   try {
     const db = c.env.DB
-    const limit = c.req.query('limit') ? parseInt(c.req.query('limit')!) : 50
+    const limit = validateLimit(c.req.query('limit'))
 
     const result = await db
       .prepare(`

@@ -1,5 +1,6 @@
 import { Context, Next } from 'hono'
 import * as jwt from 'jsonwebtoken'
+import { randomBytes } from 'crypto'
 
 export interface AuthPayload {
   userId: number
@@ -33,6 +34,28 @@ export async function verifyAuth(c: Context<AuthContext>, next: Next) {
   }
 }
 
+/**
+ * Generate JWT access token
+ * Expires in 15 minutes
+ */
 export function generateToken(userId: number, username: string, jwtSecret: string): string {
-  return jwt.sign({ userId, username }, jwtSecret, { expiresIn: '30d' })
+  return jwt.sign({ userId, username }, jwtSecret, { expiresIn: '15m' })
+}
+
+/**
+ * Generate refresh token
+ * Returns a random token string (actual expiry stored in DB)
+ */
+export function generateRefreshToken(): string {
+  return randomBytes(32).toString('hex')
+}
+
+/**
+ * Get refresh token expiry date
+ * Returns ISO timestamp for 7 days from now
+ */
+export function getRefreshTokenExpiry(): string {
+  const expiryDate = new Date()
+  expiryDate.setDate(expiryDate.getDate() + 7)
+  return expiryDate.toISOString()
 }

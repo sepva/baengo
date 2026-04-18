@@ -1,0 +1,6 @@
+-- Migration: Add account lockout tracking columns
+
+ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN locked_until TEXT;
+
+CREATE INDEX IF NOT EXISTS idx_users_locked_until ON users(locked_until);

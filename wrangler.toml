@@ -1,13 +1,7 @@
 name = "baengo"
 main = "backend/src/index.ts"
-compatibility_date = "2024-04-03"
+compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
-
-# Routes configuration
-routes = [
-  { pattern = "baengo.melios.be/api/*", zone_name = "melios.be", custom_domain = true },
-  { pattern = "baengo.melios.be/*", zone_name = "melios.be", custom_domain = true }
-]
 
 # D1 Database binding
 [[d1_databases]]
@@ -17,13 +11,13 @@ database_id = "TODO_ADD_DATABASE_ID_FROM_CLOUDFLARE"
 
 # Secrets: set via 'wrangler secret put JWT_SECRET'
 # Do NOT store secret values in wrangler.toml
+# Example: wrangler secret put JWT_SECRET
 
 # Environment configurations
 [env.production]
 vars = { ENVIRONMENT = "production" }
 routes = [
-  { pattern = "baengo.melios.be/api/*", zone_name = "melios.be", custom_domain = true },
-  { pattern = "baengo.melios.be/*", zone_name = "melios.be", custom_domain = true }
+  { pattern = "baengo.melios.be", zone_name = "melios.be" }
 ]
 
 [env.development]
