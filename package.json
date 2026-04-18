@@ -1,0 +1,22 @@
+{
+  "name": "baengo",
+  "version": "1.0.0",
+  "description": "Office bingo game on Cloudflare Workers",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "deploy": "npm run deploy -w backend && npm run deploy -w frontend",
+    "seed-db": "node scripts/seed-db.js"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

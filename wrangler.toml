@@ -1,0 +1,27 @@
+name = "baengo"
+main = "backend/src/index.ts"
+compatibility_date = "2024-04-03"
+compatibility_flags = ["nodejs_compat"]
+
+# Routes configuration
+routes = [
+  { pattern = "baengo.melios.be/api/*", zone_name = "melios.be", custom_domain = true },
+  { pattern = "baengo.melios.be/*", zone_name = "melios.be", custom_domain = true }
+]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "baengo-db"
+database_id = "TODO_ADD_DATABASE_ID_FROM_CLOUDFLARE"
+
+# Environment configurations
+[env.production]
+vars = { ENVIRONMENT = "production" }
+routes = [
+  { pattern = "baengo.melios.be/api/*", zone_name = "melios.be", custom_domain = true },
+  { pattern = "baengo.melios.be/*", zone_name = "melios.be", custom_domain = true }
+]
+
+[env.development]
+vars = { ENVIRONMENT = "development" }
