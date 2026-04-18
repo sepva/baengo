@@ -1,0 +1,70 @@
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --frozen-lockfile
+
+      - name: Type check backend
+        run: npm run type-check -w backend
+
+      - name: Type check frontend
+        run: npm run type-check -w frontend
+
+      - name: Build frontend
+        run: npm run build -w frontend
+
+      - name: Build backend
+        run: npm run build -w backend
+        env:
+          NODE_ENV: production
+
+      # Only deploy on push to main, not on PRs
+      - name: Deploy to Cloudflare
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          secrets: |
+            DATABASE_ID
+            JWT_SECRET
+        env:
+          DATABASE_ID: ${{ secrets.CLOUDFLARE_D1_DATABASE_ID }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          WRANGLER_TOML_PATH: ./wrangler.toml
+
+      - name: Deploy frontend to Cloudflare Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: baengo
+          directory: frontend/dist
+          branch: main
+
+      - name: Notify deployment success
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          echo "✅ Successfully deployed to baengo.melios.be"
