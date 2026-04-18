@@ -1,5 +1,6 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
+import DashboardPage from './pages/DashboardPage'
 import { useState, useEffect } from 'react'
 
 function App() {
@@ -14,14 +15,28 @@ function App() {
   }, [])
 
   if (loading) {
-    return <div className="flex items-center justify-center h-screen">Loading...</div>
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-lg text-gray-600">Loading Baengo...</div>
+      </div>
+    )
   }
 
   return (
     <Router>
       <Routes>
-        <Route path="/login" element={<LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />} />
-        <Route path="/" element={isAuthenticated ? <div>Dashboard coming soon</div> : <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />} />
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? <Navigate to="/" /> : <LoginPage onLoginSuccess={() => setIsAuthenticated(true)} />
+          }
+        />
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <DashboardPage /> : <Navigate to="/login" />
+          }
+        />
       </Routes>
     </Router>
   )

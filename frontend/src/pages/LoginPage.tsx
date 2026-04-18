@@ -34,6 +34,7 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
       const data = await response.json()
       localStorage.setItem('authToken', data.token)
       localStorage.setItem('username', data.username)
+      localStorage.setItem('userId', data.userId.toString())
       
       onLoginSuccess()
       navigate('/')
