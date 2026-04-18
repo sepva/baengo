@@ -52,7 +52,7 @@ leaderboard.get("/lifetime", async (c) => {
           u.id as userId,
           u.username,
           us.points,
-          us.bingo_count as bingoCount,
+          us.baengo_count as baengoCount,
           ROW_NUMBER() OVER (ORDER BY us.points DESC, us.updated_at DESC) as rank
         FROM user_scores us
         JOIN users u ON u.id = us.user_id
@@ -68,7 +68,7 @@ leaderboard.get("/lifetime", async (c) => {
       username: row.username,
       userId: row.userId,
       points: row.points,
-      bingoCount: row.bingoCount,
+      baengoCount: row.baengoCount,
     }));
 
     return c.json({
@@ -81,8 +81,8 @@ leaderboard.get("/lifetime", async (c) => {
   }
 });
 
-// Get bingo count leaderboard
-leaderboard.get("/bingos", async (c) => {
+// Get baengo count leaderboard
+leaderboard.get("/baengos", async (c) => {
   try {
     const db = c.env.DB;
     const limit = validateLimit(c.req.query("limit"));
@@ -94,11 +94,11 @@ leaderboard.get("/bingos", async (c) => {
           u.id as userId,
           u.username,
           us.points,
-          us.bingo_count as bingoCount,
-          ROW_NUMBER() OVER (ORDER BY us.bingo_count DESC, us.points DESC) as rank
+          us.baengo_count as baengoCount,
+          ROW_NUMBER() OVER (ORDER BY us.baengo_count DESC, us.points DESC) as rank
         FROM user_scores us
         JOIN users u ON u.id = us.user_id
-        ORDER BY us.bingo_count DESC, us.points DESC
+        ORDER BY us.baengo_count DESC, us.points DESC
         LIMIT ?
       `,
       )
@@ -110,7 +110,7 @@ leaderboard.get("/bingos", async (c) => {
       username: row.username,
       userId: row.userId,
       points: row.points,
-      bingoCount: row.bingoCount,
+      baengoCount: row.baengoCount,
     }));
 
     return c.json({
@@ -118,7 +118,7 @@ leaderboard.get("/bingos", async (c) => {
       total: result.results?.length || 0,
     });
   } catch (err) {
-    console.error("Bingo leaderboard error:", err);
+    console.error("Baengo leaderboard error:", err);
     return c.json({ error: "Internal Server Error" }, 500);
   }
 });
@@ -139,9 +139,9 @@ leaderboard.get("/user/:userId", async (c) => {
     }
 
     const score = (await db
-      .prepare("SELECT points, bingo_count FROM user_scores WHERE user_id = ?")
+      .prepare("SELECT points, baengo_count FROM user_scores WHERE user_id = ?")
       .bind(userId)
-      .first()) as { points: number; bingo_count: number };
+      .first()) as { points: number; baengo_count: number };
 
     // Get rank by points
     const pointsRank = (await db
@@ -149,21 +149,21 @@ leaderboard.get("/user/:userId", async (c) => {
       .bind(score.points)
       .first()) as { rank: number };
 
-    // Get rank by bingos
-    const bingoRank = (await db
+    // Get rank by baengos
+    const baengoRank = (await db
       .prepare(
-        "SELECT COUNT(*) + 1 as rank FROM user_scores WHERE bingo_count > ?",
+        "SELECT COUNT(*) + 1 as rank FROM user_scores WHERE baengo_count > ?",
       )
-      .bind(score.bingo_count)
+      .bind(score.baengo_count)
       .first()) as { rank: number };
 
     return c.json({
       userId,
       username: user.username,
       points: score.points,
-      bingoCount: score.bingo_count,
+      baengoCount: score.baengo_count,
       pointsRank: pointsRank.rank,
-      bingoRank: bingoRank.rank,
+      baengoRank: baengoRank.rank,
     });
   } catch (err) {
     console.error("User stats error:", err);

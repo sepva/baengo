@@ -149,7 +149,7 @@ export const gridApi = {
 export const leaderboardApi = {
   getLifetime: (limit = 50) =>
     client.get(`/leaderboard/lifetime?limit=${limit}`),
-  getBingos: (limit = 50) => client.get(`/leaderboard/bingos?limit=${limit}`),
+  getBaengos: (limit = 50) => client.get(`/leaderboard/baengos?limit=${limit}`),
   getUserStats: (userId: number) => client.get(`/leaderboard/user/${userId}`),
 };
 

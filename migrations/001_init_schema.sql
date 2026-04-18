@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Bingo items table
-CREATE TABLE IF NOT EXISTS bingo_items (
+CREATE TABLE IF NOT EXISTS baengo_items (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   content TEXT NOT NULL,
   category TEXT,
@@ -30,12 +30,12 @@ CREATE TABLE IF NOT EXISTS daily_grids (
   UNIQUE(user_id, grid_date)
 );
 
--- User scores table (cumulative points and bingo count)
+-- User scores table (cumulative points and baengo count)
 CREATE TABLE IF NOT EXISTS user_scores (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   user_id INTEGER NOT NULL UNIQUE,
   points INTEGER NOT NULL DEFAULT 0,
-  bingo_count INTEGER NOT NULL DEFAULT 0,
+  baengo_count INTEGER NOT NULL DEFAULT 0,
   created_at TEXT DEFAULT CURRENT_TIMESTAMP,
   updated_at TEXT NOT NULL,
   FOREIGN KEY (user_id) REFERENCES users(id)
@@ -57,4 +57,4 @@ CREATE TABLE IF NOT EXISTS completed_rows (
 CREATE INDEX IF NOT EXISTS idx_daily_grids_user_date ON daily_grids(user_id, grid_date);
 CREATE INDEX IF NOT EXISTS idx_completed_rows_user_date ON completed_rows(user_id, grid_date);
 CREATE INDEX IF NOT EXISTS idx_user_scores_points ON user_scores(points DESC);
-CREATE INDEX IF NOT EXISTS idx_user_scores_bingo_count ON user_scores(bingo_count DESC);
+CREATE INDEX IF NOT EXISTS idx_user_scores_baengo_count ON user_scores(baengo_count DESC);

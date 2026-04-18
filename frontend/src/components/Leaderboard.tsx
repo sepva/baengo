@@ -6,7 +6,7 @@ interface LeaderboardEntry {
   username: string;
   userId: number;
   points?: number;
-  bingoCount?: number;
+  baengoCount?: number;
 }
 
 interface LeaderboardProps {
@@ -14,7 +14,7 @@ interface LeaderboardProps {
 }
 
 export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
-  const [activeTab, setActiveTab] = useState<"points" | "bingos">("points");
+  const [activeTab, setActiveTab] = useState<"points" | "baengos">("points");
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -28,7 +28,7 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
       const response =
         activeTab === "points"
           ? await leaderboardApi.getLifetime(50)
-          : await leaderboardApi.getBingos(50);
+          : await leaderboardApi.getBaengos(50);
       setLeaderboard(response.data.leaderboard || []);
     } catch (error) {
       console.error("Failed to load leaderboard:", error);
@@ -54,14 +54,14 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
           🏆 Most Points
         </button>
         <button
-          onClick={() => setActiveTab("bingos")}
+          onClick={() => setActiveTab("baengos")}
           className={`px-6 py-2 rounded-lg font-medium transition ${
-            activeTab === "bingos"
+            activeTab === "baengos"
               ? "bg-purple-600 text-white"
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
-          🎉 Most Bingos
+          🎉 Most Baengos
         </button>
       </div>
 
@@ -83,7 +83,7 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                   Player
                 </th>
                 <th className="px-4 py-3 text-right text-gray-600 font-semibold">
-                  {activeTab === "points" ? "Points" : "Bingos"}
+                  {activeTab === "points" ? "Points" : "Baengos"}
                 </th>
               </tr>
             </thead>
@@ -110,7 +110,7 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                     {entry.username}
                   </td>
                   <td className="px-4 py-3 text-right font-bold text-purple-600">
-                    {activeTab === "points" ? entry.points : entry.bingoCount}
+                    {activeTab === "points" ? entry.points : entry.baengoCount}
                   </td>
                 </tr>
               ))}

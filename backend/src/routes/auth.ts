@@ -89,7 +89,7 @@ auth.post("/register", registerRateLimiter, async (c) => {
     // Initialize user scores
     await db
       .prepare(
-        "INSERT INTO user_scores (user_id, points, bingo_count, updated_at) VALUES (?, ?, ?, ?)",
+        "INSERT INTO user_scores (user_id, points, baengo_count, updated_at) VALUES (?, ?, ?, ?)",
       )
       .bind(userId, 0, 0, new Date().toISOString())
       .run();

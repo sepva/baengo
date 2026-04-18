@@ -84,11 +84,11 @@ async function seedDatabase() {
     // Build SQL insert statements
     const now = new Date().toISOString();
     const sqlStatements = [
-      "DELETE FROM bingo_items;", // Clear existing items first
+      "DELETE FROM baengo_items;", // Clear existing items first
       ...items.map((item) => {
         const content = item.content.replace(/'/g, "''"); // Escape single quotes
         const category = (item.category || "general").replace(/'/g, "''");
-        return `INSERT INTO bingo_items (content, category, created_at) VALUES ('${content}', '${category}', '${now}');`;
+        return `INSERT INTO baengo_items (content, category, created_at) VALUES ('${content}', '${category}', '${now}');`;
       }),
     ];
 

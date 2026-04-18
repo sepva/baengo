@@ -5,7 +5,7 @@ interface Env {
   DB: D1Database;
 }
 
-interface BingoItem {
+interface BaengoItem {
   id: number;
   content: string;
   marked: boolean;
@@ -76,12 +76,12 @@ grid.get("/today", verifyAuth, async (c) => {
       // Generate new grid
       const items = (await db
         .prepare(
-          "SELECT id, content FROM bingo_items ORDER BY RANDOM() LIMIT 16",
+          "SELECT id, content FROM baengo_items ORDER BY RANDOM() LIMIT 16",
         )
         .all()) as { results: Array<{ id: number; content: string }> };
 
       if (!items.results || items.results.length < 16) {
-        return c.json({ error: "Not enough bingo items in database" }, 500);
+        return c.json({ error: "Not enough baengo items in database" }, 500);
       }
 
       const selectedItems = items.results;
@@ -145,7 +145,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
     }
 
     const gridData = JSON.parse(dailyGrid.grid_data);
-    const item = gridData.items.find((i: BingoItem) => i.id === itemId);
+    const item = gridData.items.find((i: BaengoItem) => i.id === itemId);
 
     if (!item) {
       return c.json({ error: "Item not found in grid" }, 404);
@@ -166,18 +166,19 @@ grid.patch("/mark", verifyAuth, async (c) => {
       gridArray.push(
         gridData.items
           .slice(i * 4, (i + 1) * 4)
-          .map((it: BingoItem) => (it.marked ? 1 : 0)),
+          .map((it: BaengoItem) => (it.marked ? 1 : 0)),
       );
     }
 
     let pointsToAdd = 0;
-    let bingoCountToAdd = 0;
+    let baengoCountToAdd = 0;
 
     if (marked && !oldMarked) {
-      // Check for completed rows
+      // USER IS MARKING AN ITEM
+      // Check for completed rows (10 points each, but don't count as baengo)
       for (let i = 0; i < 4; i++) {
         if (isLineComplete(gridArray, i, "row")) {
-          // Check if this bingo was already recorded
+          // Check if this row was already recorded
           const existing = await db
             .prepare(
               "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
@@ -186,8 +187,8 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .first();
 
           if (!existing) {
+            console.log(`Row ${i} completed for user ${user.userId}`);
             pointsToAdd += 10;
-            bingoCountToAdd += 1;
             await db
               .prepare(
                 "INSERT INTO completed_rows (user_id, grid_date, row_type, row_index, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -198,7 +199,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
         }
       }
 
-      // Check for completed columns
+      // Check for completed columns (10 points each, but don't count as baengo)
       for (let i = 0; i < 4; i++) {
         if (isLineComplete(gridArray, i, "col")) {
           const existing = await db
@@ -209,8 +210,8 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .first();
 
           if (!existing) {
+            console.log(`Column ${i} completed for user ${user.userId}`);
             pointsToAdd += 10;
-            bingoCountToAdd += 1;
             await db
               .prepare(
                 "INSERT INTO completed_rows (user_id, grid_date, row_type, row_index, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -221,8 +222,10 @@ grid.patch("/mark", verifyAuth, async (c) => {
         }
       }
 
-      // Check for full card (Baengo!)
+      // Check for full card (Baengo!) - 100 points AND counts toward baengo leaderboard
+      console.log("Checking full card completion. GridArray:", gridArray);
       if (isFullCardComplete(gridArray)) {
+        console.log("Full card detected!");
         const existing = await db
           .prepare(
             "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ?",
@@ -231,8 +234,9 @@ grid.patch("/mark", verifyAuth, async (c) => {
           .first();
 
         if (!existing) {
+          console.log("Recording new baengo!");
           pointsToAdd += 100;
-          bingoCountToAdd += 1;
+          baengoCountToAdd += 1;
           await db
             .prepare(
               "INSERT INTO completed_rows (user_id, grid_date, row_type, row_index, created_at) VALUES (?, ?, ?, ?, ?)",
@@ -241,35 +245,125 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .run();
         }
       }
+    } else if (!marked && oldMarked) {
+      // USER IS UNMARKING AN ITEM - check which completions are broken
+      let pointsToRemove = 0;
+      let baengoCountToRemove = 0;
 
-      // Update user scores if points were added
-      if (pointsToAdd > 0) {
-        await db
-          .prepare(
-            "UPDATE user_scores SET points = points + ?, bingo_count = bingo_count + ?, updated_at = ? WHERE user_id = ?",
-          )
-          .bind(
-            pointsToAdd,
-            bingoCountToAdd,
-            new Date().toISOString(),
-            user.userId,
-          )
-          .run();
+      // Check all completed rows to see if any are now broken
+      for (let i = 0; i < 4; i++) {
+        if (!isLineComplete(gridArray, i, "row")) {
+          // This row is no longer complete, remove it if it was recorded
+          const existing = await db
+            .prepare(
+              "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
+            )
+            .bind(user.userId, today, "row", i)
+            .first();
+
+          if (existing) {
+            console.log(
+              `Row ${i} no longer complete for user ${user.userId}, removing 10 points`,
+            );
+            pointsToRemove += 10;
+            await db
+              .prepare(
+                "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
+              )
+              .bind(user.userId, today, "row", i)
+              .run();
+          }
+        }
       }
+
+      // Check all completed columns to see if any are now broken
+      for (let i = 0; i < 4; i++) {
+        if (!isLineComplete(gridArray, i, "col")) {
+          // This column is no longer complete, remove it if it was recorded
+          const existing = await db
+            .prepare(
+              "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
+            )
+            .bind(user.userId, today, "col", i)
+            .first();
+
+          if (existing) {
+            console.log(
+              `Column ${i} no longer complete for user ${user.userId}, removing 10 points`,
+            );
+            pointsToRemove += 10;
+            await db
+              .prepare(
+                "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
+              )
+              .bind(user.userId, today, "col", i)
+              .run();
+          }
+        }
+      }
+
+      // Check if full card is now broken
+      if (!isFullCardComplete(gridArray)) {
+        const existing = await db
+          .prepare(
+            "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ?",
+          )
+          .bind(user.userId, today, "full")
+          .first();
+
+        if (existing) {
+          console.log(
+            `Full card no longer complete for user ${user.userId}, removing 100 points and 1 baengo`,
+          );
+          pointsToRemove += 100;
+          baengoCountToRemove += 1;
+          await db
+            .prepare(
+              "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ?",
+            )
+            .bind(user.userId, today, "full")
+            .run();
+        }
+      }
+
+      pointsToAdd = -pointsToRemove;
+      baengoCountToAdd = -baengoCountToRemove;
+    }
+
+    // Update user scores if points changed
+    if (pointsToAdd !== 0 || baengoCountToAdd !== 0) {
+      console.log(
+        `Updating user ${user.userId} with ${pointsToAdd > 0 ? "+" : ""}${pointsToAdd} points, ${baengoCountToAdd > 0 ? "+" : ""}${baengoCountToAdd} baengos`,
+      );
+      await db
+        .prepare(
+          "UPDATE user_scores SET points = points + ?, baengo_count = baengo_count + ?, updated_at = ? WHERE user_id = ?",
+        )
+        .bind(
+          pointsToAdd,
+          baengoCountToAdd,
+          new Date().toISOString(),
+          user.userId,
+        )
+        .run();
     }
 
     // Get updated user score
     const userScore = (await db
-      .prepare("SELECT points, bingo_count FROM user_scores WHERE user_id = ?")
+      .prepare("SELECT points, baengo_count FROM user_scores WHERE user_id = ?")
       .bind(user.userId)
-      .first()) as { points: number; bingo_count: number };
+      .first()) as { points: number; baengo_count: number };
+
+    console.log(
+      `User ${user.userId} final score: ${userScore.points} points, ${userScore.baengo_count} baengos`,
+    );
 
     return c.json({
       success: true,
       items: gridData.items,
       pointsAdded: pointsToAdd,
       currentPoints: userScore.points,
-      currentBingoCount: userScore.bingo_count,
+      currentBaengoCount: userScore.baengo_count,
       isFullCard: isFullCardComplete(gridArray),
     });
   } catch (err) {

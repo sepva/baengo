@@ -3,7 +3,7 @@ import { leaderboardApi } from "../api/client";
 
 interface ScoreBoardProps {
   userId?: number;
-  onPointsUpdated?: (points: number, bingoCount: number) => void;
+  onPointsUpdated?: (points: number, baengoCount: number) => void;
 }
 
 export default function ScoreBoard({
@@ -12,9 +12,9 @@ export default function ScoreBoard({
 }: ScoreBoardProps) {
   const [stats, setStats] = useState({
     points: 0,
-    bingoCount: 0,
+    baengoCount: 0,
     pointsRank: 0,
-    bingoRank: 0,
+    baengoRank: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +29,7 @@ export default function ScoreBoard({
       if (!userId) return;
       const response = await leaderboardApi.getUserStats(userId);
       setStats(response.data);
-      onPointsUpdated?.(response.data.points, response.data.bingoCount);
+      onPointsUpdated?.(response.data.points, response.data.baengoCount);
       setLoading(false);
     } catch (error) {
       console.error("Failed to load stats:", error);
@@ -67,11 +67,11 @@ export default function ScoreBoard({
 
         <div className="bg-white rounded-lg p-4">
           <div className="text-4xl font-bold text-blue-600">
-            {stats.bingoCount}
+            {stats.baengoCount}
           </div>
-          <div className="text-sm text-gray-600">Bingos</div>
+          <div className="text-sm text-gray-600">Baengos</div>
           <div className="text-xs text-gray-500 mt-1">
-            Rank: #{stats.bingoRank}
+            Rank: #{stats.baengoRank}
           </div>
         </div>
       </div>

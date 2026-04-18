@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { gridApi } from "../api/client";
 
-interface BingoItem {
+interface BaengoItem {
   id: number;
   content: string;
   marked: boolean;
@@ -14,7 +14,7 @@ interface BingoGridProps {
 
 export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
   const [gridId, setGridId] = useState<number | null>(null);
-  const [items, setItems] = useState<BingoItem[]>([]);
+  const [items, setItems] = useState<BaengoItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [celebrating, setCelebrating] = useState(false);
 
@@ -34,7 +34,7 @@ export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
     }
   };
 
-  const handleItemClick = async (item: BingoItem) => {
+  const handleItemClick = async (item: BaengoItem) => {
     if (!gridId) return;
 
     try {
@@ -63,7 +63,7 @@ export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading your bingo card...</div>
+        <div className="text-gray-500">Loading your baengo card...</div>
       </div>
     );
   }
