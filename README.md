@@ -138,7 +138,7 @@ npm run seed-db
 
 1. **Set up Cloudflare**
    - Create D1 database: `npx wrangler d1 create baengo-db`
-   - Run migrations against production: `npx wrangler d1 migrations apply baengo-db --remote`
+   - Run initial migrations against production once: `npx wrangler d1 migrations apply baengo-db --env production --remote`
    - Create a Cloudflare Pages project named `baengo`
 
 2. **Add GitHub Secrets**
@@ -155,8 +155,11 @@ npm run seed-db
    GitHub Actions will automatically:
    - Type-check backend and frontend
    - Build frontend (Vite) and backend (Wrangler)
+   - Apply any pending D1 migrations to the production database before the Worker deploy
    - Deploy the Worker to Cloudflare Workers
    - Deploy the frontend to Cloudflare Pages
+
+   The migration step is non-destructive by default: Cloudflare D1 applies pending migrations in order and captures a backup before running them. Existing data is preserved unless a migration explicitly alters or removes it.
 
 4. **Verify deployment**
    Visit https://baengo.melios.be

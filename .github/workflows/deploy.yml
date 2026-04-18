@@ -43,6 +43,14 @@ jobs:
         env:
           NODE_ENV: production
 
+      - name: Apply D1 migrations
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: d1 migrations apply baengo-db --env production --remote
+
       # Only deploy on push to main, not on PRs
       - name: Deploy to Cloudflare
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
