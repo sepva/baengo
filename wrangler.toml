@@ -15,6 +15,15 @@ binding = "DB"
 database_name = "baengo-db"
 database_id = "d4a9eca3-6117-4b3f-820e-77b7a3c23ff0"
 
+# KV namespace for distributed rate limiting
+# Run: wrangler kv namespace create RATE_LIMIT_KV
+# Then replace the placeholder IDs below with the output.
+# For preview (wrangler dev --remote): wrangler kv namespace create RATE_LIMIT_KV --preview
+[[kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "3d132deb469346049c75de5a9b15e163"
+preview_id = "3b7c3afde8f94a719f828aaaa4401d3b"
+
 # Secrets: set via 'wrangler secret put JWT_SECRET'
 # Do NOT store secret values in wrangler.toml
 # Example: wrangler secret put JWT_SECRET
@@ -31,6 +40,10 @@ binding = "DB"
 database_name = "baengo-db"
 database_id = "d4a9eca3-6117-4b3f-820e-77b7a3c23ff0"
 
+[[env.production.kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "3d132deb469346049c75de5a9b15e163"
+
 [env.development]
 vars = { ENVIRONMENT = "development" }
 
@@ -38,3 +51,8 @@ vars = { ENVIRONMENT = "development" }
 binding = "DB"
 database_name = "baengo-db"
 database_id = "d4a9eca3-6117-4b3f-820e-77b7a3c23ff0"
+
+[[env.development.kv_namespaces]]
+binding = "RATE_LIMIT_KV"
+id = "3d132deb469346049c75de5a9b15e163"
+preview_id = "3b7c3afde8f94a719f828aaaa4401d3b"

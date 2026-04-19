@@ -1,8 +1,10 @@
 import { Hono } from "hono";
 import { ValidationError } from "../utils/error-mapper";
+import { createRateLimiter } from "../middleware/rate-limit";
 
 interface Env {
   DB: D1Database;
+  RATE_LIMIT_KV: KVNamespace;
 }
 
 interface LeaderboardEntry {
@@ -14,6 +16,13 @@ interface LeaderboardEntry {
 }
 
 const leaderboard = new Hono<{ Bindings: Env }>();
+
+// Rate limiting: 30 requests per minute per IP (unauthenticated public endpoint)
+const leaderboardRateLimiter = createRateLimiter({
+  maxRequests: 30,
+  windowMs: 60 * 1000, // 1 minute
+  keyPrefix: "leaderboard",
+});
 
 /**
  * Validate and parse limit query parameter
@@ -40,7 +49,7 @@ function validateLimit(limitParam: string | undefined): number {
 }
 
 // Get lifetime leaderboard (by points)
-leaderboard.get("/lifetime", async (c) => {
+leaderboard.get("/lifetime", leaderboardRateLimiter, async (c) => {
   try {
     const db = c.env.DB;
     const limit = validateLimit(c.req.query("limit"));
@@ -82,7 +91,7 @@ leaderboard.get("/lifetime", async (c) => {
 });
 
 // Get baengo count leaderboard
-leaderboard.get("/baengos", async (c) => {
+leaderboard.get("/baengos", leaderboardRateLimiter, async (c) => {
   try {
     const db = c.env.DB;
     const limit = validateLimit(c.req.query("limit"));

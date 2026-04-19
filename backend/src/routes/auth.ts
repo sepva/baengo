@@ -20,6 +20,7 @@ import { createRateLimiter } from "../middleware/rate-limit";
 
 interface Env {
   DB: D1Database;
+  RATE_LIMIT_KV: KVNamespace;
   JWT_SECRET: string;
 }
 
@@ -29,12 +30,14 @@ const auth = new Hono<{ Bindings: Env }>();
 const registerRateLimiter = createRateLimiter({
   maxRequests: 5,
   windowMs: 10 * 60 * 1000, // 10 minutes
+  keyPrefix: "register",
 });
 
 // Rate limiting: 10 requests per 15 minutes for login
 const loginRateLimiter = createRateLimiter({
   maxRequests: 10,
   windowMs: 15 * 60 * 1000, // 15 minutes
+  keyPrefix: "login",
 });
 
 // Register endpoint
