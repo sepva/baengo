@@ -9,7 +9,6 @@ import { mapErrorToResponse } from "./utils/error-mapper";
 
 export interface Env {
   DB: D1Database;
-  RATE_LIMIT_KV: KVNamespace;
   ENVIRONMENT?: string;
   JWT_SECRET?: string;
 }

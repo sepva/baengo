@@ -1,10 +1,8 @@
 import { Hono } from "hono";
 import { verifyAuth, AuthPayload } from "../middleware/auth";
-import { createRateLimiter } from "../middleware/rate-limit";
 
 interface Env {
   DB: D1Database;
-  RATE_LIMIT_KV: KVNamespace;
 }
 
 interface BaengoItem {
@@ -14,13 +12,6 @@ interface BaengoItem {
 }
 
 const grid = new Hono<{ Bindings: Env; Variables: { user: AuthPayload } }>();
-
-// Rate limiting: 60 mark requests per minute per IP
-const markRateLimiter = createRateLimiter({
-  maxRequests: 60,
-  windowMs: 60 * 1000, // 1 minute
-  keyPrefix: "mark",
-});
 
 // Helper function to get today's date in Brussels timezone
 function getTodayBrussels(): string {
@@ -136,7 +127,7 @@ grid.get("/today", verifyAuth, async (c) => {
 });
 
 // Mark/unmark item
-grid.patch("/mark", verifyAuth, markRateLimiter, async (c) => {
+grid.patch("/mark", verifyAuth, async (c) => {
   try {
     const user = c.get("user") as AuthPayload;
     const { gridId, itemId, marked } = await c.req.json();
