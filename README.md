@@ -116,9 +116,7 @@ Edit `config/bingo_items.yaml`:
 ```yaml
 items:
   - content: "Your office phrase here"
-    category: sayings
   - content: "Your action here"
-    category: actions
 ```
 
 Then seed the database:

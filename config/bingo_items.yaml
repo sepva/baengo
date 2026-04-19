@@ -3,112 +3,46 @@
 # These will be randomly selected for each player's daily bingo card
 
 items:
-  # Typical AE sayings
-  - content: "Let's circle back on this"
-    category: sayings
-  - content: "Synergy"
-    category: sayings
-  - content: "Leverage"
-    category: sayings
-  - content: "Think outside the box"
-    category: sayings
-  - content: "Low-hanging fruit"
-    category: sayings
-  - content: "Win-win situation"
-    category: sayings
-  - content: "Touch base"
-    category: sayings
-  - content: "Going forward"
-    category: sayings
-  - content: "Deep dive"
-    category: sayings
-  - content: "Take it offline"
-    category: sayings
-
-  # Typical actions/events
-  - content: "Someone joins late to the meeting"
-    category: actions
-  - content: "Unmute after being asked to"
-    category: actions
-  - content: "Blames the connection"
-    category: actions
-  - content: "Background has a plant"
-    category: actions
-  - content: "Someone's cat joins the call"
-    category: actions
-  - content: "Typing noises during presentation"
-    category: actions
-  - content: "Standing up to stretch"
-    category: actions
-  - content: "Reading something off-screen"
-    category: actions
-  - content: "Wrong virtual background"
-    category: actions
-  - content: "Forgets to share their screen"
-    category: actions
-
-  # Meeting-related events
-  - content: "Meeting runs over time"
-    category: events
-  - content: "Topic changes mid-meeting"
-    category: events
-  - content: "Coffee break mentioned"
-    category: events
-  - content: "Someone references another meeting"
-    category: events
-  - content: "Agenda is not followed"
-    category: events
-  - content: "Lots of 'agree's in chat"
-    category: events
-  - content: "Question asked after 'any questions?'"
-    category: events
-  - content: "Action items forgotten"
-    category: events
-  - content: "Wrong meeting link sent"
-    category: events
-  - content: "Waiting for someone to call in"
-    category: events
-
-  # Work-related stuff
-  - content: "Ticket created mid-meeting"
-    category: work
-  - content: "Code review mentioned"
-    category: work
-  - content: "Bug in production"
-    category: work
-  - content: "Sprint planning chaos"
-    category: work
-  - content: "Deploy on Friday"
-    category: work
-  - content: "Database migration needed"
-    category: work
-  - content: "API rate limit hit"
-    category: work
-  - content: "Docker image bloat"
-    category: work
-  - content: "Cache invalidation joke"
-    category: work
-  - content: "It works on my machine"
-    category: work
-
-  # Office environment
-  - content: "Loud noise in background"
-    category: office
-  - content: "Doorbell rings"
-    category: office
-  - content: "Someone eating audibly"
-    category: office
-  - content: "Keyboard is too loud"
-    category: office
-  - content: "Background music too loud"
-    category: office
-  - content: "Phone notification sound"
-    category: office
-  - content: "Slack notification spam"
-    category: office
-  - content: "Email marking issue"
-    category: office
-  - content: "Missing document link"
-    category: office
-  - content: "Someone working from coffee shop"
-    category: office
+  - content: "Michiel fluit"
+  - content: "Siegfrid bedreigt iemand"
+  - content: "Eendjes reference"
+  - content: "Iemand krijgt zijn scherm niet aan"
+  - content: "Herlinde's stand-up duurt langer dan 30 min"
+  - content: "Iemand zegt 'Fijn weekend!'"
+  - content: "Celine zegt 'Neeehe'"
+  - content: "Elias zoekt een telefooncel met PC in de hand"
+  - content: "Sigfriend komt met een Monty Python reference"
+  - content: "Herlinde quote 'AEers helpen elkaar'"
+  - content: "Iemand maakt een woordgraep"
+  - content: "Iemand heeft geen lunch bij"
+  - content: "Iemand praat over sporten"
+  - content: "Iemand klaagt over de badges"
+  - content: "Iemand gebruikt het woord AI meer dan 3x in een zin"
+  - content: "Iemand vraagt hoe het weekend was"
+  - content: "Er wordt een comment gemaakt over de binnentuin"
+  - content: "We nemen meer dan een half uur koekjes pauze"
+  - content: "Een Antwerpenaar zegt 'Welk?' in plaats van 'Wat?' wanneer iets onduidelijk is"
+  - content: "Iemand is te laat door de file"
+  - content: "Discussie over binnen of buiten eten"
+  - content: "Wanneer iemand van Studio verschijnt ('Oh jij bent hier ook vandaag?')"
+  - content: "Michiel zegt dat hij uitgebreid gekookt heeft in het weekend"
+  - content: "Iemand begint over FIP"
+  - content: "Er wordt gehaat op ServiceNow"
+  - content: "Iemand klaagt over Zaepfloor"
+  - content: "Siegfrid maakt een meme"
+  - content: "We maken een wandelingetje om het gebouw"
+  - content: "Elias zegt 'Ik heb alles kapot gemaakt'"
+  - content: "Iemand vervloekt de hekken"
+  - content: "Iemand vermeldt het kantoor in Berchem"
+  - content: "Iemand vraagt aan Seppe of Dries hoe de match was en of ze gewonnen zijn"
+  - content: "Iemand vraagt waarom Felix nooit naar Berchem komt"
+  - content: "Gevangenis reference over Camco"
+  - content: "Iemand vraagt 'En hoe is het nog op u project?'"
+  - content: "Seppe gaat ostentatief achterover leunen"
+  - content: "Er is iemand out-of-office"
+  - content: "Er wordt een foto van iemand in de groep gestuurd"
+  - content: "Seppe komt toe zonder een plaats gereserveerd te hebben"
+  - content: "Siegfrid gaat op de grond liggen"
+  - content: "Iemand wordt random opgebeld"
+  - content: "Geoguessr/Timeguessr spelen"
+  - content: "Siegfrid quote: 'Sometimes my genius... It's almost frightening'"
