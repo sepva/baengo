@@ -87,7 +87,7 @@ export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
       {/* Bingo Grid */}
       <div className="rounded-xl border border-white/10 bg-gradient-to-b from-white/[0.06] via-white/[0.04] to-white/[0.02] p-8 shadow-[0_18px_45px_rgba(0,0,0,0.35)]">
         <h2 className="mb-6 text-2xl font-bold text-[#f4f7fb]">
-          Your Daily Bingo Card
+          Your Daily Baengo Card
         </h2>
 
         <div className="grid grid-cols-4 gap-4">

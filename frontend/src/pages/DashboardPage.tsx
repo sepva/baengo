@@ -55,7 +55,7 @@ export default function DashboardPage() {
                   ✓ Complete the full card = 100 points + Baengo!
                 </li>
                 <li className="leading-relaxed">
-                  ✓ Grid resets daily at midnight (Brussels time)
+                  ✓ Grid resets daily at midnight
                 </li>
               </ul>
             </div>

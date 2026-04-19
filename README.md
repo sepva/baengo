@@ -176,7 +176,7 @@ npm run seed-db
 
 ### Leaderboard
 - `GET /api/leaderboard/lifetime` - Points ranking
-- `GET /api/leaderboard/bingos` - Bingo count ranking
+- `GET /api/leaderboard/baengos` - Bingo count ranking
 - `GET /api/leaderboard/user/:userId` - User stats
 
 ## 🔒 Security
