@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <defs>
+    <style>
+      .b-bg { fill: #ff8a2a; opacity: 0.12; }
+      .b-border { stroke: #ff8a2a; stroke-width: 3; fill: none; opacity: 0.45; }
+      .b-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif; font-size: 70px; font-weight: 900; fill: #ff9a3f; }
+    </style>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100" height="100" fill="#0a0c10"/>
+  
+  <!-- Rounded square background -->
+  <rect class="b-bg" x="15" y="15" width="70" height="70" rx="12"/>
+  
+  <!-- Rounded square border -->
+  <rect class="b-border" x="15" y="15" width="70" height="70" rx="12"/>
+  
+  <!-- B text -->
+  <text class="b-text" x="50" y="75" text-anchor="middle">B</text>
+</svg>
