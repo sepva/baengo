@@ -138,11 +138,23 @@ grid.patch("/mark", verifyAuth, async (c) => {
     const dailyGrid = (await db
       .prepare("SELECT * FROM daily_grids WHERE id = ? AND user_id = ?")
       .bind(gridId, user.userId)
-      .first()) as { id: number; grid_data: string } | undefined;
+      .first()) as
+      | { id: number; grid_date: string; grid_data: string }
+      | undefined;
 
     if (!dailyGrid) {
       return c.json({ error: "Grid not found" }, 404);
     }
+
+    // Reject stale grids so day rollover cannot affect scoring for a different day.
+    if (dailyGrid.grid_date !== today) {
+      return c.json(
+        { error: "Grid is no longer active. Refresh to get today's grid." },
+        409,
+      );
+    }
+
+    const gridDate = dailyGrid.grid_date;
 
     const gridData = JSON.parse(dailyGrid.grid_data);
     const item = gridData.items.find((i: BaengoItem) => i.id === itemId);
@@ -183,7 +195,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .prepare(
               "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
             )
-            .bind(user.userId, today, "row", i)
+            .bind(user.userId, gridDate, "row", i)
             .first();
 
           if (!existing) {
@@ -193,7 +205,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
               .prepare(
                 "INSERT INTO completed_rows (user_id, grid_date, row_type, row_index, created_at) VALUES (?, ?, ?, ?, ?)",
               )
-              .bind(user.userId, today, "row", i, new Date().toISOString())
+              .bind(user.userId, gridDate, "row", i, new Date().toISOString())
               .run();
           }
         }
@@ -206,7 +218,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .prepare(
               "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
             )
-            .bind(user.userId, today, "col", i)
+            .bind(user.userId, gridDate, "col", i)
             .first();
 
           if (!existing) {
@@ -216,7 +228,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
               .prepare(
                 "INSERT INTO completed_rows (user_id, grid_date, row_type, row_index, created_at) VALUES (?, ?, ?, ?, ?)",
               )
-              .bind(user.userId, today, "col", i, new Date().toISOString())
+              .bind(user.userId, gridDate, "col", i, new Date().toISOString())
               .run();
           }
         }
@@ -230,7 +242,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
           .prepare(
             "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ?",
           )
-          .bind(user.userId, today, "full")
+          .bind(user.userId, gridDate, "full")
           .first();
 
         if (!existing) {
@@ -241,7 +253,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .prepare(
               "INSERT INTO completed_rows (user_id, grid_date, row_type, row_index, created_at) VALUES (?, ?, ?, ?, ?)",
             )
-            .bind(user.userId, today, "full", -1, new Date().toISOString())
+            .bind(user.userId, gridDate, "full", -1, new Date().toISOString())
             .run();
         }
       }
@@ -258,7 +270,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .prepare(
               "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
             )
-            .bind(user.userId, today, "row", i)
+            .bind(user.userId, gridDate, "row", i)
             .first();
 
           if (existing) {
@@ -270,7 +282,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
               .prepare(
                 "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
               )
-              .bind(user.userId, today, "row", i)
+              .bind(user.userId, gridDate, "row", i)
               .run();
           }
         }
@@ -284,7 +296,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .prepare(
               "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
             )
-            .bind(user.userId, today, "col", i)
+            .bind(user.userId, gridDate, "col", i)
             .first();
 
           if (existing) {
@@ -296,7 +308,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
               .prepare(
                 "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
               )
-              .bind(user.userId, today, "col", i)
+              .bind(user.userId, gridDate, "col", i)
               .run();
           }
         }
@@ -308,7 +320,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
           .prepare(
             "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ?",
           )
-          .bind(user.userId, today, "full")
+          .bind(user.userId, gridDate, "full")
           .first();
 
         if (existing) {
@@ -321,7 +333,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
             .prepare(
               "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ?",
             )
-            .bind(user.userId, today, "full")
+            .bind(user.userId, gridDate, "full")
             .run();
         }
       }
