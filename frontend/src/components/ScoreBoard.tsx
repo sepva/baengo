@@ -44,33 +44,33 @@ export default function ScoreBoard({
 
   if (loading && userId) {
     return (
-      <div className="bg-white rounded-lg shadow-lg p-6">
-        <div className="text-gray-500 text-center">Loading...</div>
+      <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.35)]">
+        <div className="text-center text-[#9ca6b2]">Loading...</div>
       </div>
     );
   }
 
   return (
-    <div className="bg-gradient-to-br from-purple-100 to-blue-100 rounded-lg shadow-lg p-6">
-      <h3 className="text-xl font-bold text-gray-800 mb-4">Your Stats</h3>
+    <div className="rounded-xl border border-white/10 bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-white/[0.02] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.35)]">
+      <h3 className="mb-4 text-xl font-bold text-[#f4f7fb]">Your Stats</h3>
 
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg p-4">
-          <div className="text-4xl font-bold text-purple-600">
+        <div className="rounded-lg border border-white/10 bg-[#131a22] p-4">
+          <div className="text-4xl font-extrabold text-[#ff8f35]">
             {stats.points}
           </div>
-          <div className="text-sm text-gray-600">Total Points</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm font-medium text-[#b8c0ca]">Total Points</div>
+          <div className="mt-1 text-xs text-[#8491a0]">
             Rank: #{stats.pointsRank}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg p-4">
-          <div className="text-4xl font-bold text-blue-600">
+        <div className="rounded-lg border border-white/10 bg-[#131a22] p-4">
+          <div className="text-4xl font-extrabold text-[#ff6d43]">
             {stats.baengoCount}
           </div>
-          <div className="text-sm text-gray-600">Baengos</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-sm font-medium text-[#b8c0ca]">Baengos</div>
+          <div className="mt-1 text-xs text-[#8491a0]">
             Rank: #{stats.baengoRank}
           </div>
         </div>
@@ -78,7 +78,7 @@ export default function ScoreBoard({
 
       <button
         onClick={refreshStats}
-        className="w-full mt-4 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition"
+        className="mt-4 w-full rounded-lg bg-gradient-to-r from-[#ff7c24] to-[#ff4f2a] px-4 py-2 font-semibold text-white shadow-[0_10px_24px_rgba(255,95,40,0.35)] transition hover:brightness-110"
       >
         Refresh Stats
       </button>

@@ -36,45 +36,45 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-blue-600">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-md">
-        <h1 className="text-4xl font-bold text-center mb-8 text-purple-600">
+    <div className="min-h-screen flex items-center justify-center bg-[#0b0d10] px-4">
+      <div className="w-full max-w-md rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.08] via-white/[0.04] to-white/[0.02] p-8 shadow-[0_28px_80px_rgba(0,0,0,0.55)] backdrop-blur-sm">
+        <h1 className="mb-8 text-center text-4xl font-extrabold tracking-tight text-[#ff8a2a]">
           Baengo
         </h1>
-        <h2 className="text-2xl font-bold text-center mb-6 text-gray-800">
+        <h2 className="mb-6 text-center text-2xl font-bold text-[#f3f5f8]">
           {isLogin ? "Welcome Back" : "Join the Game"}
         </h2>
 
         {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
+          <div className="mb-4 rounded-lg border border-red-400/35 bg-red-500/10 p-3 text-red-200">
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-semibold tracking-wide text-[#a9b1bc]">
               Username
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded-lg border border-white/15 bg-[#141920] px-4 py-2 text-[#eef2f7] placeholder:text-[#7f8894] focus:border-[#ff8a2a] focus:outline-none focus:ring-2 focus:ring-[#ff8a2a]/35"
               placeholder="Enter your username"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="mb-1 block text-sm font-semibold tracking-wide text-[#a9b1bc]">
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full rounded-lg border border-white/15 bg-[#141920] px-4 py-2 text-[#eef2f7] placeholder:text-[#7f8894] focus:border-[#ff8a2a] focus:outline-none focus:ring-2 focus:ring-[#ff8a2a]/35"
               placeholder="Enter your password"
               required
             />
@@ -83,18 +83,18 @@ export default function LoginPage({ onLoginSuccess }: LoginPageProps) {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition disabled:opacity-50"
+            className="w-full rounded-lg bg-gradient-to-r from-[#ff7c24] to-[#ff4f2a] px-4 py-2 font-bold text-white shadow-[0_10px_28px_rgba(255,92,31,0.35)] transition hover:brightness-110 disabled:opacity-50"
           >
             {loading ? "Loading..." : isLogin ? "Login" : "Register"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
-          <p className="text-gray-600">
+          <p className="text-[#aab1bd]">
             {isLogin ? "Don't have an account? " : "Already have an account? "}
             <button
               onClick={() => setIsLogin(!isLogin)}
-              className="text-purple-600 font-bold hover:text-purple-700"
+              className="font-bold text-[#ff8a2a] hover:text-[#ff9f4d]"
             >
               {isLogin ? "Register" : "Login"}
             </button>

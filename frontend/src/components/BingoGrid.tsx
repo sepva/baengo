@@ -63,7 +63,7 @@ export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-500">Loading your baengo card...</div>
+        <div className="text-[#9ca6b2]">Loading your baengo card...</div>
       </div>
     );
   }
@@ -72,12 +72,12 @@ export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
     <div className="relative">
       {/* Celebration overlay */}
       {celebrating && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50 pointer-events-none">
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center bg-black/65 backdrop-blur-sm">
           <div className="text-center">
-            <div className="text-8xl font-bold text-white animate-pulse mb-4">
+            <div className="mb-4 text-8xl font-extrabold tracking-tight text-[#ff8a2a] animate-pulse">
               BAENGO! 🎉
             </div>
-            <div className="text-4xl text-yellow-300 animate-bounce">
+            <div className="text-4xl font-bold text-[#ffe2c7] animate-bounce">
               +100 POINTS!
             </div>
           </div>
@@ -85,8 +85,8 @@ export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
       )}
 
       {/* Bingo Grid */}
-      <div className="bg-white rounded-lg shadow-lg p-8">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">
+      <div className="rounded-xl border border-white/10 bg-gradient-to-b from-white/[0.06] via-white/[0.04] to-white/[0.02] p-8 shadow-[0_18px_45px_rgba(0,0,0,0.35)]">
+        <h2 className="mb-6 text-2xl font-bold text-[#f4f7fb]">
           Your Daily Bingo Card
         </h2>
 
@@ -100,15 +100,15 @@ export default function BingoGrid({ onBaengo, onPointsAdded }: BingoGridProps) {
                 transition-all duration-300 transform hover:scale-105
                 ${
                   item.marked
-                    ? "bg-gradient-to-br from-purple-500 to-blue-600 text-white shadow-lg scale-105"
-                    : "bg-gray-100 text-gray-700 border-2 border-gray-200 hover:border-purple-400"
+                    ? "scale-105 border border-[#ff9e5a]/55 bg-gradient-to-br from-[#ff812f] to-[#ff4f2a] text-white shadow-[0_12px_26px_rgba(255,94,35,0.35)]"
+                    : "border-2 border-white/12 bg-[#1a2029] text-[#d5dde7] hover:border-[#ff8a2a]/70 hover:bg-[#212936]"
                 }
               `}
             >
-              <span className="block line-clamp-3 text-xs md:text-sm">
+              <span className="block line-clamp-3 text-xs leading-snug md:text-sm">
                 {item.content}
               </span>
-              {item.marked && <span className="text-2xl mt-1">✓</span>}
+              {item.marked && <span className="mt-1 text-2xl">✓</span>}
             </button>
           ))}
         </div>

@@ -38,27 +38,27 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h3 className="text-2xl font-bold text-gray-800 mb-6">Leaderboard</h3>
+    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_18px_45px_rgba(0,0,0,0.35)]">
+      <h3 className="mb-6 text-2xl font-bold text-[#f4f7fb]">Leaderboard</h3>
 
       {/* Tab buttons */}
-      <div className="flex gap-4 mb-6">
+      <div className="mb-6 flex gap-4">
         <button
           onClick={() => setActiveTab("points")}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
+          className={`rounded-lg px-6 py-2 font-semibold transition ${
             activeTab === "points"
-              ? "bg-purple-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              ? "bg-gradient-to-r from-[#ff7c24] to-[#ff4f2a] text-white shadow-[0_10px_24px_rgba(255,95,40,0.35)]"
+              : "border border-white/15 bg-white/[0.03] text-[#c2cbd6] hover:border-[#ff8a2a]/60 hover:text-[#f6f9fc]"
           }`}
         >
           🏆 Most Points
         </button>
         <button
           onClick={() => setActiveTab("baengos")}
-          className={`px-6 py-2 rounded-lg font-medium transition ${
+          className={`rounded-lg px-6 py-2 font-semibold transition ${
             activeTab === "baengos"
-              ? "bg-purple-600 text-white"
-              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              ? "bg-gradient-to-r from-[#ff7c24] to-[#ff4f2a] text-white shadow-[0_10px_24px_rgba(255,95,40,0.35)]"
+              : "border border-white/15 bg-white/[0.03] text-[#c2cbd6] hover:border-[#ff8a2a]/60 hover:text-[#f6f9fc]"
           }`}
         >
           🎉 Most Baengos
@@ -66,23 +66,23 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
       </div>
 
       {loading ? (
-        <div className="text-center py-8 text-gray-500">
+        <div className="py-8 text-center text-[#9ca6b2]">
           Loading leaderboard...
         </div>
       ) : leaderboard.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No data yet</div>
+        <div className="py-8 text-center text-[#9ca6b2]">No data yet</div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b-2 border-gray-200">
-                <th className="px-4 py-3 text-left text-gray-600 font-semibold">
+              <tr className="border-b border-white/15">
+                <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-[#9ca6b2]">
                   Rank
                 </th>
-                <th className="px-4 py-3 text-left text-gray-600 font-semibold">
+                <th className="px-4 py-3 text-left font-semibold uppercase tracking-wider text-[#9ca6b2]">
                   Player
                 </th>
-                <th className="px-4 py-3 text-right text-gray-600 font-semibold">
+                <th className="px-4 py-3 text-right font-semibold uppercase tracking-wider text-[#9ca6b2]">
                   {activeTab === "points" ? "Points" : "Baengos"}
                 </th>
               </tr>
@@ -91,8 +91,8 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
               {leaderboard.map((entry, idx) => (
                 <tr
                   key={entry.userId}
-                  className={`border-b border-gray-100 hover:bg-gray-50 transition ${
-                    idx < 3 ? "bg-yellow-50" : ""
+                  className={`border-b border-white/10 transition hover:bg-white/[0.03] ${
+                    idx < 3 ? "bg-[#ff7a2c]/10" : ""
                   }`}
                 >
                   <td className="px-4 py-3">
@@ -106,10 +106,10 @@ export default function Leaderboard({ refreshTrigger }: LeaderboardProps) {
                             : `${entry.rank}.`}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-medium text-gray-800">
+                  <td className="px-4 py-3 font-medium text-[#e7ecf3]">
                     {entry.username}
                   </td>
-                  <td className="px-4 py-3 text-right font-bold text-purple-600">
+                  <td className="px-4 py-3 text-right font-bold text-[#ff9a49]">
                     {activeTab === "points" ? entry.points : entry.baengoCount}
                   </td>
                 </tr>

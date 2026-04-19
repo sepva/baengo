@@ -21,8 +21,10 @@ function App() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-gray-50">
-        <div className="text-lg text-gray-600">Loading Baengo...</div>
+      <div className="flex items-center justify-center h-screen bg-[#0b0d10]">
+        <div className="rounded-2xl border border-white/10 bg-white/[0.03] px-8 py-6 text-lg font-semibold tracking-wide text-[#ff8a2a] shadow-[0_18px_50px_rgba(0,0,0,0.35)]">
+          Loading Baengo...
+        </div>
       </div>
     );
   }

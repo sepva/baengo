@@ -18,7 +18,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent text-[#e8edf2]">
       <Header username={username} />
 
       <main className="container mx-auto px-4 py-8">
@@ -40,15 +40,23 @@ export default function DashboardPage() {
             />
 
             {/* Quick Stats */}
-            <div className="bg-blue-50 rounded-lg shadow-lg p-6">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">
+            <div className="rounded-xl border border-white/10 bg-white/[0.03] p-6 shadow-[0_18px_40px_rgba(0,0,0,0.35)]">
+              <h3 className="mb-4 text-lg font-bold text-[#f4f7fb]">
                 How to Play
               </h3>
-              <ul className="text-sm text-gray-700 space-y-2">
-                <li>✓ Click items as you spot them in the office</li>
-                <li>✓ Complete a row or column = 10 points</li>
-                <li>✓ Complete the full card = 100 points + Baengo!</li>
-                <li>✓ Grid resets daily at midnight (Brussels time)</li>
+              <ul className="space-y-2 text-sm text-[#b8c0ca]">
+                <li className="leading-relaxed">
+                  ✓ Click items as you spot them in the office
+                </li>
+                <li className="leading-relaxed">
+                  ✓ Complete a row or column = 10 points
+                </li>
+                <li className="leading-relaxed">
+                  ✓ Complete the full card = 100 points + Baengo!
+                </li>
+                <li className="leading-relaxed">
+                  ✓ Grid resets daily at midnight (Brussels time)
+                </li>
               </ul>
             </div>
           </div>
