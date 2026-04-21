@@ -15,6 +15,8 @@ interface RateLimitStore {
 
 // In-memory storage (works for single instance; for distributed, use Redis/KV)
 const rateLimitStore: RateLimitStore = {};
+var requestCounter = 0; // Counter to trigger cleanup
+const CLEANUP_EVERY_REQUESTS = 100; // Cleanup old entries every N requests
 
 /**
  * Rate limiting middleware for Hono
@@ -24,6 +26,12 @@ export function createRateLimiter(config: RateLimitConfig) {
   return async (c: Context, next: Next) => {
     const ip = getClientIp(c);
     const now = Date.now();
+
+    requestCounter++;
+    if (requestCounter > CLEANUP_EVERY_REQUESTS) {
+      cleanupRateLimitStore();
+      requestCounter = 0;
+    }
 
     // Initialize or reset if window expired
     if (!rateLimitStore[ip] || now > rateLimitStore[ip].resetTime) {
