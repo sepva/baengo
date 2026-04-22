@@ -28,42 +28,53 @@ export function createRateLimiter(config: RateLimitConfig) {
     const now = Date.now();
 
     requestCounter++;
-    if (requestCounter >= CLEANUP_EVERY_REQUESTS) {
-      cleanupRateLimitStore();
+    const shouldCleanup = requestCounter >= CLEANUP_EVERY_REQUESTS;
+    if (shouldCleanup) {
       requestCounter = 0;
     }
 
-    // Initialize or reset if window expired
-    if (!rateLimitStore[ip] || now > rateLimitStore[ip].resetTime) {
-      rateLimitStore[ip] = {
-        count: 1,
-        resetTime: now + config.windowMs,
-      };
-      c.header("X-RateLimit-Limit", config.maxRequests.toString());
-      c.header("X-RateLimit-Remaining", (config.maxRequests - 1).toString());
-      await next();
-      return;
-    }
+    try {
+      // Initialize or reset if window expired
+      if (!rateLimitStore[ip] || now > rateLimitStore[ip].resetTime) {
+        rateLimitStore[ip] = {
+          count: 1,
+          resetTime: now + config.windowMs,
+        };
+        c.header("X-RateLimit-Limit", config.maxRequests.toString());
+        c.header("X-RateLimit-Remaining", (config.maxRequests - 1).toString());
+        await next();
+        return;
+      }
 
-    // Increment counter
-    rateLimitStore[ip].count++;
-    const remaining = Math.max(
-      0,
-      config.maxRequests - rateLimitStore[ip].count,
-    );
-    const retryAfter = Math.ceil((rateLimitStore[ip].resetTime - now) / 1000);
-
-    c.header("X-RateLimit-Limit", config.maxRequests.toString());
-    c.header("X-RateLimit-Remaining", remaining.toString());
-
-    if (rateLimitStore[ip].count > config.maxRequests) {
-      c.header("Retry-After", retryAfter.toString());
-      throw new RateLimitError(
-        `Rate limit exceeded. Retry after ${retryAfter} seconds.`,
+      // Increment counter
+      rateLimitStore[ip].count++;
+      const remaining = Math.max(
+        0,
+        config.maxRequests - rateLimitStore[ip].count,
       );
-    }
+      const retryAfter = Math.ceil((rateLimitStore[ip].resetTime - now) / 1000);
 
-    await next();
+      c.header("X-RateLimit-Limit", config.maxRequests.toString());
+      c.header("X-RateLimit-Remaining", remaining.toString());
+
+      if (rateLimitStore[ip].count > config.maxRequests) {
+        c.header("Retry-After", retryAfter.toString());
+        throw new RateLimitError(
+          `Rate limit exceeded. Retry after ${retryAfter} seconds.`,
+        );
+      }
+
+      await next();
+    } finally {
+      if (shouldCleanup) {
+        const cleanupTask = Promise.resolve().then(() => cleanupRateLimitStore());
+        if (c.executionCtx?.waitUntil) {
+          c.executionCtx.waitUntil(cleanupTask);
+        } else {
+          void cleanupTask;
+        }
+      }
+    }
   };
 }
 
