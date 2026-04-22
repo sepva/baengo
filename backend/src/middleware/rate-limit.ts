@@ -28,7 +28,7 @@ export function createRateLimiter(config: RateLimitConfig) {
     const now = Date.now();
 
     requestCounter++;
-    if (requestCounter > CLEANUP_EVERY_REQUESTS) {
+    if (requestCounter >= CLEANUP_EVERY_REQUESTS) {
       cleanupRateLimitStore();
       requestCounter = 0;
     }
