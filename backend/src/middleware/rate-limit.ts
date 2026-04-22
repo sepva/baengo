@@ -15,7 +15,7 @@ interface RateLimitStore {
 
 // In-memory storage (works for single instance; for distributed, use Redis/KV)
 const rateLimitStore: RateLimitStore = {};
-var requestCounter = 0; // Counter to trigger cleanup
+let requestCounter = 0; // Counter to trigger cleanup
 const CLEANUP_EVERY_REQUESTS = 100; // Cleanup old entries every N requests
 
 /**
