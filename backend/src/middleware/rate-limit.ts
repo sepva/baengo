@@ -44,34 +44,49 @@ export function createRateLimiter(config: RateLimitConfig) {
         c.header("X-RateLimit-Remaining", (config.maxRequests - 1).toString());
         await next();
         return;
-      }
-
-      // Increment counter
-      rateLimitStore[ip].count++;
-      const remaining = Math.max(
-        0,
-        config.maxRequests - rateLimitStore[ip].count,
-      );
-      const retryAfter = Math.ceil((rateLimitStore[ip].resetTime - now) / 1000);
-
-      c.header("X-RateLimit-Limit", config.maxRequests.toString());
-      c.header("X-RateLimit-Remaining", remaining.toString());
-
-      if (rateLimitStore[ip].count > config.maxRequests) {
-        c.header("Retry-After", retryAfter.toString());
-        throw new RateLimitError(
-          `Rate limit exceeded. Retry after ${retryAfter} seconds.`,
+      } else {
+        // Increment counter
+        rateLimitStore[ip].count++;
+        const remaining = Math.max(
+          0,
+          config.maxRequests - rateLimitStore[ip].count,
         );
-      }
+        const retryAfter = Math.ceil((rateLimitStore[ip].resetTime - now) / 1000);
 
-      await next();
+        c.header("X-RateLimit-Limit", config.maxRequests.toString());
+        c.header("X-RateLimit-Remaining", remaining.toString());
+
+        if (rateLimitStore[ip].count > config.maxRequests) {
+          c.header("Retry-After", retryAfter.toString());
+          throw new RateLimitError(
+            `Rate limit exceeded. Retry after ${retryAfter} seconds.`,
+          );
+        }
+
+        await next();
+      }
     } finally {
       if (shouldCleanup) {
-        const cleanupTask = Promise.resolve().then(() => cleanupRateLimitStore());
         if (c.executionCtx?.waitUntil) {
+          const cleanupTask = new Promise<void>((resolve, reject) => {
+            queueMicrotask(() => {
+              try {
+                cleanupRateLimitStore();
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
+            });
+          });
           c.executionCtx.waitUntil(cleanupTask);
         } else {
-          void cleanupTask;
+          queueMicrotask(() => {
+            try {
+              cleanupRateLimitStore();
+            } catch (error) {
+              console.error("Rate limit cleanup failed", error);
+            }
+          });
         }
       }
     }
