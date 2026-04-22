@@ -15,6 +15,8 @@ interface RateLimitStore {
 
 // In-memory storage (works for single instance; for distributed, use Redis/KV)
 const rateLimitStore: RateLimitStore = {};
+let requestCounter = 0; // Counter to trigger cleanup
+const CLEANUP_EVERY_REQUESTS = 100; // Cleanup old entries every N requests
 
 /**
  * Rate limiting middleware for Hono
@@ -25,37 +27,69 @@ export function createRateLimiter(config: RateLimitConfig) {
     const ip = getClientIp(c);
     const now = Date.now();
 
-    // Initialize or reset if window expired
-    if (!rateLimitStore[ip] || now > rateLimitStore[ip].resetTime) {
-      rateLimitStore[ip] = {
-        count: 1,
-        resetTime: now + config.windowMs,
-      };
-      c.header("X-RateLimit-Limit", config.maxRequests.toString());
-      c.header("X-RateLimit-Remaining", (config.maxRequests - 1).toString());
-      await next();
-      return;
+    requestCounter++;
+    const shouldCleanup = requestCounter >= CLEANUP_EVERY_REQUESTS;
+    if (shouldCleanup) {
+      requestCounter = 0;
     }
 
-    // Increment counter
-    rateLimitStore[ip].count++;
-    const remaining = Math.max(
-      0,
-      config.maxRequests - rateLimitStore[ip].count,
-    );
-    const retryAfter = Math.ceil((rateLimitStore[ip].resetTime - now) / 1000);
+    try {
+      // Initialize or reset if window expired
+      if (!rateLimitStore[ip] || now > rateLimitStore[ip].resetTime) {
+        rateLimitStore[ip] = {
+          count: 1,
+          resetTime: now + config.windowMs,
+        };
+        c.header("X-RateLimit-Limit", config.maxRequests.toString());
+        c.header("X-RateLimit-Remaining", (config.maxRequests - 1).toString());
+        await next();
+        return;
+      } else {
+        // Increment counter
+        rateLimitStore[ip].count++;
+        const remaining = Math.max(
+          0,
+          config.maxRequests - rateLimitStore[ip].count,
+        );
+        const retryAfter = Math.ceil((rateLimitStore[ip].resetTime - now) / 1000);
 
-    c.header("X-RateLimit-Limit", config.maxRequests.toString());
-    c.header("X-RateLimit-Remaining", remaining.toString());
+        c.header("X-RateLimit-Limit", config.maxRequests.toString());
+        c.header("X-RateLimit-Remaining", remaining.toString());
 
-    if (rateLimitStore[ip].count > config.maxRequests) {
-      c.header("Retry-After", retryAfter.toString());
-      throw new RateLimitError(
-        `Rate limit exceeded. Retry after ${retryAfter} seconds.`,
-      );
+        if (rateLimitStore[ip].count > config.maxRequests) {
+          c.header("Retry-After", retryAfter.toString());
+          throw new RateLimitError(
+            `Rate limit exceeded. Retry after ${retryAfter} seconds.`,
+          );
+        }
+
+        await next();
+      }
+    } finally {
+      if (shouldCleanup) {
+        if (c.executionCtx?.waitUntil) {
+          const cleanupTask = new Promise<void>((resolve, reject) => {
+            queueMicrotask(() => {
+              try {
+                cleanupRateLimitStore();
+                resolve();
+              } catch (error) {
+                reject(error);
+              }
+            });
+          });
+          c.executionCtx.waitUntil(cleanupTask);
+        } else {
+          queueMicrotask(() => {
+            try {
+              cleanupRateLimitStore();
+            } catch (error) {
+              console.error("Rate limit cleanup failed", error);
+            }
+          });
+        }
+      }
     }
-
-    await next();
   };
 }
 
