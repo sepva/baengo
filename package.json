@@ -7,7 +7,10 @@
     "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
     "build": "npm run build -w backend && npm run build -w frontend",
     "deploy": "npm run deploy -w backend && npm run deploy -w frontend",
-    "seed-db": "node scripts/seed-db.js"
+    "seed-db": "node scripts/seed-db.js",
+    "cleanup-db": "node scripts/cleanup-stale-data.js",
+    "cleanup-db:local": "node scripts/cleanup-stale-data.js --local",
+    "cleanup-db:dry-run": "node scripts/cleanup-stale-data.js --dry-run"
   },
   "workspaces": [
     "backend",
