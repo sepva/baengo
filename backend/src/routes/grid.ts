@@ -13,14 +13,22 @@ interface BaengoItem {
 
 const grid = new Hono<{ Bindings: Env; Variables: { user: AuthPayload } }>();
 
-// Helper function to get today's date in Brussels timezone
-function getTodayBrussels(): string {
+// Helper function to get the start of the current week (Sunday) in Brussels timezone.
+// Returns a "week-YYYY-MM-DD" string so it never collides with old daily "YYYY-MM-DD" rows.
+function getCurrentWeekStart(): string {
   const now = new Date();
   // Convert to Brussels time (CET/CEST)
   const brusselsDate = new Date(
     now.toLocaleString("en-US", { timeZone: "Europe/Brussels" }),
   );
-  return brusselsDate.toISOString().split("T")[0];
+  // dayOfWeek: 0 = Sunday, 1 = Monday, …, 6 = Saturday
+  const dayOfWeek = brusselsDate.getDay();
+  const sunday = new Date(brusselsDate);
+  sunday.setDate(brusselsDate.getDate() - dayOfWeek);
+  const year = sunday.getFullYear();
+  const month = String(sunday.getMonth() + 1).padStart(2, "0");
+  const day = String(sunday.getDate()).padStart(2, "0");
+  return `week-${year}-${month}-${day}`;
 }
 
 // Helper function to shuffle array
@@ -51,17 +59,17 @@ function isFullCardComplete(grid: number[][]): boolean {
   return grid.every((row) => row.every((val) => val === 1));
 }
 
-// Get or generate today's grid for user
+// Get or generate this week's grid for user
 grid.get("/today", verifyAuth, async (c) => {
   try {
     const user = c.get("user") as AuthPayload;
     const db = c.env.DB;
-    const today = getTodayBrussels();
+    const currentWeekStart = getCurrentWeekStart();
 
-    // Check if grid exists for today
+    // Check if grid exists for this week
     let dailyGrid = (await db
       .prepare("SELECT * FROM daily_grids WHERE user_id = ? AND grid_date = ?")
-      .bind(user.userId, today)
+      .bind(user.userId, currentWeekStart)
       .first()) as
       | {
           id: number;
@@ -100,7 +108,7 @@ grid.get("/today", verifyAuth, async (c) => {
         )
         .bind(
           user.userId,
-          today,
+          currentWeekStart,
           JSON.stringify(gridData),
           new Date().toISOString(),
         )
@@ -108,7 +116,7 @@ grid.get("/today", verifyAuth, async (c) => {
 
       return c.json({
         gridId: result.meta.last_row_id,
-        gridDate: today,
+        gridDate: currentWeekStart,
         items: gridData.items,
       });
     }
@@ -117,7 +125,7 @@ grid.get("/today", verifyAuth, async (c) => {
     const gridData = JSON.parse(dailyGrid.grid_data);
     return c.json({
       gridId: dailyGrid.id,
-      gridDate: today,
+      gridDate: currentWeekStart,
       items: gridData.items,
     });
   } catch (err) {
@@ -132,7 +140,7 @@ grid.patch("/mark", verifyAuth, async (c) => {
     const user = c.get("user") as AuthPayload;
     const { gridId, itemId, marked } = await c.req.json();
     const db = c.env.DB;
-    const today = getTodayBrussels();
+    const currentWeekStart = getCurrentWeekStart();
 
     // Get current grid
     const dailyGrid = (await db
@@ -146,10 +154,10 @@ grid.patch("/mark", verifyAuth, async (c) => {
       return c.json({ error: "Grid not found" }, 404);
     }
 
-    // Reject stale grids so day rollover cannot affect scoring for a different day.
-    if (dailyGrid.grid_date !== today) {
+    // Reject stale grids so weekly rollover cannot affect scoring for a different week.
+    if (dailyGrid.grid_date !== currentWeekStart) {
       return c.json(
-        { error: "Grid is no longer active. Refresh to get today's grid." },
+        { error: "Grid is no longer active. Refresh to get this week's grid." },
         409,
       );
     }
