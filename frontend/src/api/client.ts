@@ -153,4 +153,8 @@ export const leaderboardApi = {
   getUserStats: (userId: number) => client.get(`/leaderboard/user/${userId}`),
 };
 
+export const suggestionApi = {
+  create: (content: string) => client.post("/suggestions", { content }),
+};
+
 export default client;

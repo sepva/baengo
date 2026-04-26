@@ -3,6 +3,7 @@ import Header from "../components/Header";
 import BingoGrid from "../components/BingoGrid";
 import ScoreBoard from "../components/ScoreBoard";
 import Leaderboard from "../components/Leaderboard";
+import SuggestionBox from "../components/SuggestionBox";
 
 export default function DashboardPage() {
   const username = localStorage.getItem("username") || "Player";
@@ -59,6 +60,8 @@ export default function DashboardPage() {
                 </li>
               </ul>
             </div>
+
+            <SuggestionBox />
           </div>
         </div>
 

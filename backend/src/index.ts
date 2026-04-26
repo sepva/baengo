@@ -3,6 +3,7 @@ import { cors } from "hono/cors";
 import authRoutes from "./routes/auth";
 import gridRoutes from "./routes/grid";
 import leaderboardRoutes from "./routes/leaderboard";
+import suggestionsRoutes from "./routes/suggestions";
 import { AuthPayload } from "./middleware/auth";
 import { securityHeaders } from "./middleware/security-headers";
 import { mapErrorToResponse } from "./utils/error-mapper";
@@ -93,6 +94,7 @@ app.use("*", async (c, next) => {
 app.route("/api/auth", authRoutes);
 app.route("/api/grid", gridRoutes);
 app.route("/api/leaderboard", leaderboardRoutes);
+app.route("/api/suggestions", suggestionsRoutes);
 
 // 404 handler
 app.notFound((c) => {
