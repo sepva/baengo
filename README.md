@@ -8,6 +8,7 @@ Baengo is an office bingo game built with Cloudflare Workers (Hono), D1, React, 
 - Scoring:
    - 10 points for each completed row.
    - 10 points for each completed column.
+   - 10 points for each completed diagonal
    - 100 points plus 1 baengo for a full card.
 - Leaderboards:
    - Lifetime points ranking.

@@ -50,7 +50,7 @@ export default function DashboardPage() {
                   ✓ Click items as you spot them in the office
                 </li>
                 <li className="leading-relaxed">
-                  ✓ Complete a row or column = 10 points
+                  ✓ Complete a row, column or diagonal = 10 points
                 </li>
                 <li className="leading-relaxed">
                   ✓ Complete the full card = 100 points + Baengo!

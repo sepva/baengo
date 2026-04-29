@@ -54,6 +54,17 @@ function isLineComplete(
   }
 }
 
+// Helper function to check if a diagonal is complete
+function isDiagonalComplete(grid: number[][], diagonalIndex: 0 | 1): boolean {
+  if (diagonalIndex === 0) {
+    // Top-left to bottom-right
+    return grid.every((row, rowIndex) => row[rowIndex] === 1);
+  }
+
+  // Top-right to bottom-left
+  return grid.every((row, rowIndex) => row[grid.length - 1 - rowIndex] === 1);
+}
+
 // Helper function to check if full card is complete
 function isFullCardComplete(grid: number[][]): boolean {
   return grid.every((row) => row.every((val) => val === 1));
@@ -242,6 +253,29 @@ grid.patch("/mark", verifyAuth, async (c) => {
         }
       }
 
+      // Check for completed diagonals (10 points each, but don't count as baengo)
+      for (const i of [0, 1] as const) {
+        if (isDiagonalComplete(gridArray, i)) {
+          const existing = await db
+            .prepare(
+              "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
+            )
+            .bind(user.userId, gridDate, "diag", i)
+            .first();
+
+          if (!existing) {
+            console.log(`Diagonal ${i} completed for user ${user.userId}`);
+            pointsToAdd += 10;
+            await db
+              .prepare(
+                "INSERT INTO completed_rows (user_id, grid_date, row_type, row_index, created_at) VALUES (?, ?, ?, ?, ?)",
+              )
+              .bind(user.userId, gridDate, "diag", i, new Date().toISOString())
+              .run();
+          }
+        }
+      }
+
       // Check for full card (Baengo!) - 100 points AND counts toward baengo leaderboard
       console.log("Checking full card completion. GridArray:", gridArray);
       if (isFullCardComplete(gridArray)) {
@@ -317,6 +351,31 @@ grid.patch("/mark", verifyAuth, async (c) => {
                 "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
               )
               .bind(user.userId, gridDate, "col", i)
+              .run();
+          }
+        }
+      }
+
+      // Check all completed diagonals to see if any are now broken
+      for (const i of [0, 1] as const) {
+        if (!isDiagonalComplete(gridArray, i)) {
+          const existing = await db
+            .prepare(
+              "SELECT id FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
+            )
+            .bind(user.userId, gridDate, "diag", i)
+            .first();
+
+          if (existing) {
+            console.log(
+              `Diagonal ${i} no longer complete for user ${user.userId}, removing 10 points`,
+            );
+            pointsToRemove += 10;
+            await db
+              .prepare(
+                "DELETE FROM completed_rows WHERE user_id = ? AND grid_date = ? AND row_type = ? AND row_index = ?",
+              )
+              .bind(user.userId, gridDate, "diag", i)
               .run();
           }
         }
