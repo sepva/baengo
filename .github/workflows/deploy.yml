@@ -61,6 +61,14 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
+      - name: Sync production admin secret
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: printf '%s' "$ADMIN_SECRET" | npx wrangler secret put ADMIN_SECRET --env production -c wrangler.toml
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
+
       - name: Deploy to Cloudflare
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: npx wrangler deploy --env production -c wrangler.toml

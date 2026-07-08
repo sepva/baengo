@@ -138,6 +138,8 @@ export const authApi = {
     client
       .post("/auth/refresh", { refreshToken })
       .then((r) => handleAuthResponse(r.data)),
+  resetPassword: (token: string, newPassword: string) =>
+    client.post("/auth/reset-password", { token, newPassword }),
 };
 
 export const gridApi = {

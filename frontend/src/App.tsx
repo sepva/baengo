@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import { useState, useEffect } from "react";
 
 function App() {
@@ -42,6 +43,7 @@ function App() {
             )
           }
         />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route
           path="/"
           element={
